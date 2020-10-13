@@ -16,8 +16,18 @@
         </b-list-group-item>
       </b-list-group>
 
-      <b-button variant="primary">Submit</b-button>
-      <b-button variant="success" @click="next">Next</b-button>
+      <b-button
+          variant="primary"
+          @click="submitAnswer"
+          :disabled="selectedIndex === null || answered"
+      >
+        Submit
+      </b-button>
+      <b-button
+          variant="success"
+          @click="next">
+        Next
+      </b-button>
     </b-jumbotron>
   </div>
 </template>
@@ -29,11 +39,14 @@ export default {
   props: {
     currentQuestion: Object,
     next: Function,
+    increment: Function,
   },
   data() {
     return {
       selectedIndex: null,
-      shuffledAnswers: []
+      shuffledAnswers: [],
+      correctIndex: null,
+      answered: false,
     }
   },
   computed: {
@@ -47,6 +60,7 @@ export default {
       handler() {
         this.selectedIndex = null;
         this.shuffleAnswers();
+        this.answered = false
       }
     }
   },
@@ -57,7 +71,13 @@ export default {
     shuffleAnswers() {
       let answers = [...this.currentQuestion.incorrect_answers, this.currentQuestion.correct_answer];
       this.shuffledAnswers = _.shuffle(answers);
+      this.correctIndex = this.shuffledAnswers.indexOf((this.currentQuestion.correct_answer))
       return answers;
+    },
+    submitAnswer() {
+      let isCorrect = (this.selectedIndex === this.correctIndex);
+      this.increment(isCorrect)
+      this.answered = true
     }
   }
 }
